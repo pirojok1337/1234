@@ -1,0 +1,108 @@
+﻿Проверяем битность ОС Debian
+
+arch
+Вывод команды должен быть:
+x86_64
+В противном случае требуется переустановка ОС используя x64 дистрибутив
+Для SB60, SB120, GB4, GB8 вывод должен быть:
+armv7l
+Проверяем версию ОС Debian
+Проверка требуется серверам кроме SB60, SB120, GB4, GB8. Проверка версии релиза ОС:
+
+cat /etc/*release*
+Требуется чтобы версия была VERSION="8 (jessie)" 
+Если версия  VERSION="7 (wheezy)", то требуется выполнить действия для :
+apt-get update
+apt-get upgrade
+apt-get dist-upgrade
+Установить репозиторий netselect-apt и дополнительного ПО.
+
+apt-get install -y sudo netselect-apt sysv-rc-conf wget openssh-server openssh-client autoconf gcc make zip zlibc zlib1g ca-certificates ntpdate mc nano apt-transport-https 
+Синхронизируем время с помощью утилиты ntpdate
+ntpdate ntp.time.in.ua
+Назначение имени для host
+Правка текущего hostname:
+Прописываем в терминале
+hostname имя_хоста
+К примеру: hostname SIMBOX120-78
+Крайне не рекомендуетя использовать в имени хоста символы нижнего подчеркивания ("_"). Некоторые операционные системы не понимают его, что может привести к ошибкам работы при обращении к хосту.
+Далее правим файл /etc/hosts
+mcedit /etc/hosts
+Приводим к виду:
+127.0.0.1 localhost.localdomain localhost имя_хоста
+К примеру: 127.0.0.1 localhost.localdomain SIMBOX120-78
+Заменяем содержимое файла согласно пути /etc/hostname на требуемое имя_хоста
+mcedit /etc/hostname 
+К примеру в файле должно быть только: SIMBOX8-888
+Заключение, если вы правильно настроили hostname, то у вас будут отображаться вот такие результаты выполнения команд:
+hostname - отобразит ваше имя хоста
+hostname -i - отобразит ip адрес которому вы назначали данное имя_хоста
+Если же hostname назначен не верно, то команда: hostname -i выдаст вот такой результат:
+hostname -i
+hostname: Name or service not known
+Увеличить количество дескрипторов файлов для пользователя antrax
+Добавление библиотеки, которая устанавливает ограничения на системные ресурсы, которые могут быть получены в сеансе пользователя
+echo "session required pam_limits.so" >> /etc/pam.d/login
+Настройка контроля ресурсов для antrax
+echo "antrax soft nofile 4096" >> /etc/security/limits.conf
+echo "antrax hard nofile 16384" >> /etc/security/limits.conf
+echo 'if [ $USER = antrax ]; then' >> /etc/profile
+echo "ulimit -n 16384" >> /etc/profile
+echo "ulimit -c unlimited" >> /etc/profile
+echo "fi" >> /etc/profile
+Отключение работы по протоколу IPv6 и настройка протокола IPv4
+Правим файл конфигураций /etc/sysctl.conf
+mcedit /etc/sysctl.conf
+Включаем возможность маршрутизации пакетов между сетевыми интерфейсами протокола IPv4.
+Приводим к виду значения:
+net.ipv4.ip_forvard = 1
+Выключаем поддержку протокола IPv6 добавлением строк:
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1
+Так же требуется дополнительные строки net.ipv6.conf.iface.disable_ipv6 = 1, где  в строке iface - название интерфейса
+Применяем настройки:
+sysctl -p
+Настройка виртуального сетевого интерфейса (alias)  для 2U реков или ПК c 3U реками 
+Данная настройка производится только для оборудования старого образца - 2U и 3U реков.
+Редактируем интерфейс для плат в файле с названием ifcfg-iface относительно пути /etc/network/interfaces
+auto eth1
+allow-hotplug eth1
+iface eth1 inet static
+address 192.168.10.1
+netmask 255.255.255.0
+hwaddress ether 00:11:22:AA:CC:DD
+Настройка alias соединения для ethernet интерфейса по которому осуществляется подключение к сети Internet, если не работает/отсутствует второй интерфейс у сервера. Для 3U река или ethernet соединение для кросс-платы в 2U реке.
+auto eth0:0
+allow-hotplug eth0:0
+iface eth0:0 inet static
+address 192.168.131.1
+netmask 255.255.255.0
+Установка java и jsvc
+Проверяем версию java:
+java -version
+Пример вывода:
+java version "1.8.0_XX"
+Java(TM) SE Runtime Environment (build 1.8.0_XXX-bXX)
+Java HotSpot(TM) 64-Bit Server VM (build 25.XXX-bXX, mixed mode)
+
+где XXX-bXX это подверсия и может быть разных значений.
+Если установленная Java другого формата, та вам стоит удалить Java и установить нужную версию.
+Удаление Java
+apt-cache search java | awk '{print($1)}' | grep -E -e '^(ia32-)?(sun|oracle)-java' -e '^openjdk-' -e '^icedtea' -e '^(default|gcj)-j(re|dk)' -e '^gcj-(.*)-j(re|dk)' -e 'java-common' | xargs sudo apt-get -y remove
+Установка  Java
+su -
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+apt-get update
+apt-get install oracle-java8-installer
+exit
+Добавление настройки в системный файл запуска /etc/profile
+echo "export JAVA_HOME="/usr/java/latest"" >> /etc/profile
+Установка jsvc
+apt-get install jsvc
+Конфигурирование локалей
+dpkg-reconfigure locales 
+
