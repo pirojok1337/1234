@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
-#echo "`date`"  >> /home/office/result.txt
-
-echo "id_17"  >> /home/office/result.txt
+echo 0 > /sys/class/gpio/gpio16/value
+sleep 1
+echo 1 > /sys/class/gpio/gpio16/value
+sleep 1
