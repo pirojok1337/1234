@@ -6,3 +6,4 @@ https://www.ukrnames.com/hosting/vds/vds_order.jsp - VPS Centos 6 первый �
 
 https://linuxize.com/post/how-to-install-mysql-on-debian-9/ - mysql
 
+https://www.internet-technologies.ru/articles/sistema-registracii-polzovateley-s-pomoschyu-php-i-mysql.html - avto
