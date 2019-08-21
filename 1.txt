@@ -2,4 +2,5 @@ https://www.raspberrypi.org/downloads/raspberry-pi-desktop/ - OS
 
 https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-debian-9 - apache
 
+https://www.ukrnames.com/hosting/vds/vds_order.jsp - VPS Centos 6 первый месяц 28 грн, потом 229/месяц
 
