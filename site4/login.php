@@ -12,32 +12,30 @@
 	// вывод "Session is set"; // в целях проверки
 	header("Location: intropage.php");
 	}
-
 	if(isset($_POST["login"])){
-
 	if(!empty($_POST['username']) && !empty($_POST['password'])) {
 	$username=htmlspecialchars($_POST['username']);
 	$password=htmlspecialchars($_POST['password']);
-	$query=mysqli_query($con,"SELECT * FROM userlistdb.usertbl WHERE username='".$username."' AND password='".$password."'");
+	$passworddm=md5($password);
+	$query=mysqli_query($con,"SELECT * FROM userlistdb.usertbl WHERE username='".$username."' AND password='".$passworddm."'");
 	$numrows=mysqli_num_rows($query);
 	if($numrows!=0)
  {
 while($row=mysqli_fetch_assoc($query))
  {
 	$dbusername=$row['username'];
-  $dbpassword=$row['password'];
+	$dbpassword=$row['password'];
  }
-  if($username == $dbusername && $password == $dbpassword)
+  if($username == $dbusername && $passworddm == $dbpassword)
  {
 	// старое место расположения
 	//  session_start();
 	 $_SESSION['session_username']=$username;
  /* Перенаправление браузера */
    header("Location: intropage.php");
-	}
+  }
 	} else {
 	//  $message = "Invalid username or password!";
-
 	echo  "Invalid username or password!";
  }
 	} else {
@@ -61,7 +59,5 @@ type="text" value=""></label></p>
    </form>
  </div>
 </div>
-
-
 </body>
 </html>
