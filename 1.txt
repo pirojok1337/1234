@@ -18,3 +18,13 @@ PRIMARY KEY  (`id`),
 UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+
+header('Refresh: 5; url=test.php');
+
+?>
+
+<div id="welcome">
+
+   <p><label>Done</label><Br>
+</div>
+
